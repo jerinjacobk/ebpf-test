@@ -1,0 +1,10 @@
+.ebpf_test.ko.cmd
+.ebpf_test.mod.o.cmd
+.ebpf_test.o.cmd
+.tmp_versions/
+Module.symvers
+ebpf_test.ko
+ebpf_test.mod.c
+ebpf_test.mod.o
+ebpf_test.o
+modules.order
