@@ -8,3 +8,4 @@ ebpf_test.mod.c
 ebpf_test.mod.o
 ebpf_test.o
 modules.order
+a.out
