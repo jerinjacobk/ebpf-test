@@ -21,6 +21,7 @@ struct dummy_offset {
 
 #define	TEST_FILL_1	0xDEADBEEF
 
+#if 0
 /* store immediate test-cases */
 static const struct ebpf_insn test_prog[] = {
 	{
@@ -57,6 +58,17 @@ static const struct ebpf_insn test_prog[] = {
 		.code = (BPF_JMP | EBPF_EXIT),
 	},
 };
+
+#else
+
+static const u64 test_prog[] = {
+        0x1000000b7,
+        0x10005,
+        0x2000000b7,
+        0x95,
+};
+
+#endif
 
 int run_ebpf_test(const struct ebpf_insn *fptr, u32 len,
 			       u32 stack_depth, const void *ctx,
@@ -102,7 +114,9 @@ static int __init test_ebpf_init(void)
 	int rc;
 	u32 insns_cnt = sizeof(test_prog) / sizeof(struct ebpf_insn);
 
-	rc = run_ebpf_test(test_prog, insns_cnt, 512, &ctx, &ret);
+
+	rc = run_ebpf_test((struct ebpf_insn*)test_prog, insns_cnt,
+			   512, &ctx, &ret);
 	if (!rc)
 		pr_cont("ret=%d\n", ret);
 
