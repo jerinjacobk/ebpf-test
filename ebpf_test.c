@@ -60,16 +60,64 @@ static const struct ebpf_insn test_prog[] = {
 };
 
 #else
-
 static const u64 test_prog[] = {
-        0x1000000b7,
-        0x10005,
-        0x2000000b7,
+        0xb4,
+        0x81261,
+        0x1379,
+        0x181461,
+        0x101579,
+        0x80215,
+        0xffffff85000903d5,
+        0x162e000a0425,
+        0xdeadbeef000b0545,
+        0xc325d,
+        0xd426d,
+        0xe52bd,
+        0xf534d,
         0x95,
+        0x100000047,
+        0xfff60005,
+        0x200000047,
+        0xfff50005,
+        0x400000047,
+        0xfff40005,
+        0x800000047,
+        0xfff30005,
+        0x1000000047,
+        0xfff20005,
+        0x2000000047,
+        0xfff10005,
+        0x4000000047,
+        0xfff00005,
+        0x8000000047,
+        0xffef0005,
 };
 
-#endif
 
+struct dummy_vect8 {
+	struct dummy_offset in[8];
+	struct dummy_offset out[8];
+};
+
+static void
+test_jump1_prepare(void *arg)
+{
+	struct dummy_vect8 *dv;
+	uint64_t v1, v2;
+
+	dv = arg;
+
+	v1 = 0xffff000011112222;
+	v2 = 0x1111222233334444;
+
+	memset(dv, 0, sizeof(*dv));
+	dv->in[0].u64 = v1;
+	dv->in[1].u64 = v2;
+	dv->in[0].u32 = (v1 << 12) + (v2 >> 6);
+	dv->in[1].u32 = (v2 << 12) - (v1 >> 6);
+}
+
+#endif
 int run_ebpf_test(const struct ebpf_insn *fptr, u32 len,
 			       u32 stack_depth, const void *ctx,
 			       unsigned int *ret)
@@ -107,14 +155,16 @@ fail1:
 	return rc;
 }
 
+struct dummy_offset ctx;
+
 static int __init test_ebpf_init(void)
 {
-	struct dummy_offset ctx;
 	int ret;
 	int rc;
 	u32 insns_cnt = sizeof(test_prog) / sizeof(struct ebpf_insn);
 
-
+	memset(&ctx, 0, sizeof(ctx));
+	test_jump1_prepare(&ctx);
 	rc = run_ebpf_test((struct ebpf_insn*)test_prog, insns_cnt,
 			   512, &ctx, &ret);
 	if (!rc)
